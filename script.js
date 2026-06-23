@@ -3,18 +3,13 @@ console.log("Hello class");
 const htmlDivElement = document.getElementById("root");
 const htmlButtonElement = document.getElementById("myButton");
 
-let x = {
-  x: 0,
-  toString: function () {
-    return this.x++;
-  },
-};
 
-if (x == 0 && x == 1 && x == 2) {
-  console.log("All conditions met");
-} else {
-  console.log("Conditions not met");
-}
+
+// if (x == 0 && x == 1 && x == 2) {
+//   console.log("All conditions met");
+// } else {
+//   console.log("Conditions not met");
+// }
 
 // console.dir(htmlDivElement.style);
 // console.log(Math.random());
@@ -33,7 +28,7 @@ if (x == 0 && x == 1 && x == 2) {
 
 htmlButtonElement.addEventListener("click", () => {
   htmlDivElement.style.backgroundColor = "red";
-  // console.log(Math.random());
+  console.log(Math.random());
   const red = Math.random() * 255;
   const green = Math.random() * 255;
   const blue = Math.random() * 255;
@@ -130,5 +125,3 @@ async function fetchData(apiLink) {
 fetchData(apiLink);
 
 console.log("After data");
-
-// 12323277 - Sai vaishnos
