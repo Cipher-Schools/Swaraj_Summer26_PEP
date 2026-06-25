@@ -1,0 +1,17 @@
+<p>accor works!</p>
+
+<div class="">
+  @for (i of accordionData; track $index) {
+    <div class="border-solid p-5 m-5 border-2 border-gray-300 rounded-lg">
+      <h2>{{ i.title }}</h2>
+      @if (i.isOpen === true) {
+        <p>{{ i.content }}</p>
+      }
+
+
+      <button (click)="toggleAccordion($index)" class="cursor-pointer">
+        {{ i.isOpen ? 'Close' : 'Open' }}
+      </button>
+    </div>
+  }
+</div>
