@@ -1,0 +1,43 @@
+<!-- <h1 class="text-4xl p-28">Hello class</h1>
+<p>{{name()}}</p> -->
+
+<div class="text-6xl p-10">
+
+
+<nav class="flex gap-4 text-2xl p-2">
+  <a routerLink='child'>Child</a>
+  <button routerLink="about">About</button>
+  <button routerLink="contact">contact</button>
+</nav>
+
+<!-- <app-card [parentData]="title()"></app-card> -->
+
+<!-- <div class="flex flex-wrap">
+  @for (i of arr; track $index) {
+    <app-card [data]="i" [parentObj]="obj"></app-card>
+  }
+</div> -->
+
+<!-- <app-card (sendData)="receive Data($event)"></app-card> -->
+
+<input type="text" class="border-2" (input)="onInput($event)">
+<button (click)="addTodo()" class="border-2 cursor-pointer">ADD TODO ✅</button>
+<div>
+
+@for(item of todoArr(); track $index) {
+  <div>
+    @if(item.isDone) {
+      <p class="line-through text-red-500">{{item.text}}</p>
+    }@else{
+      <p>{{item.text}}</p>
+    }
+
+  </div>
+}
+
+</div>
+
+
+<!-- <router-outlet></router-outlet> -->
+
+</div>
