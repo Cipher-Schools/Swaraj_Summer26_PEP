@@ -31,7 +31,47 @@ export class App {
       isDone: false
     }
 
+    if(this.todoText.trim() === ""){
+      alert("Please enter some text");
+      return;
+    } 
+
     this.todoArr.set([...this.todoArr(), obj]);
+    this.todoText = "";
+  }
+  deleteTodo(delId: number, flag : boolean){
+    console.log(delId);
+
+    this.todoArr.update((item) => {
+      return item.filter((todo: todoInterface) => {
+        if(todo.id === delId){
+          if(flag == true){
+            this.todoText = todo.text;
+          }
+          
+          return false;
+        }
+        return true;
+      });
+    })
+  }
+
+  updateTodo(id: number){
+    this.deleteTodo(id, true);
+  }
+
+  toggleTodo(id: number){
+    this.todoArr.update((item) => {
+      return item.map((todo: todoInterface) => {
+        if (todo.id === id) {
+          return {
+            ...todo,
+            isDone: !todo.isDone
+          }
+        }
+        return todo;
+      })
+    })
   }
 
   // arr: number[] = [

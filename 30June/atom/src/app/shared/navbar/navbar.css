@@ -1,0 +1,9 @@
+.commonNavStyle{
+    color: rgb(255, 255, 255);
+}
+
+.commonNavStyle:hover{
+    cursor: pointer;
+    color: rgb(0, 0, 0);
+    transition: all 0.5s ease-in-out;
+}
