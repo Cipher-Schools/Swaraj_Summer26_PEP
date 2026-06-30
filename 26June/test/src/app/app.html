@@ -20,7 +20,7 @@
 
 <!-- <app-card (sendData)="receive Data($event)"></app-card> -->
 
-<input type="text" class="border-2" (input)="onInput($event)">
+<input type="text" class="border-2" (input)="onInput($event)" [value]="todoText">
 <button (click)="addTodo()" class="border-2 cursor-pointer">ADD TODO ✅</button>
 <div>
 
