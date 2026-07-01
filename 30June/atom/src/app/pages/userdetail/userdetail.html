@@ -1,0 +1,11 @@
+<p>userdetail works!</p>
+@if(userData() == {}){
+    <p>User not found Or data Loading</p>
+}@else{
+    <p>User Details:</p>
+    <ul>
+        <li>ID: {{ userData().id }}</li>
+        <li>Name: {{ userData().name }}</li>
+        <li>Email: {{ userData().email }}</li>
+    </ul>
+}

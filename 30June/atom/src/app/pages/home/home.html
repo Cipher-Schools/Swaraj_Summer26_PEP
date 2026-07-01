@@ -3,7 +3,7 @@
 
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     @for(item of users; track item.id){
-      <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition duration-300">
+      <div [routerLink]="['/home/user/', item.id]" class="bg-white rounded-xl shadow-lg p-6 hover:shadow-2xl transition duration-300">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-xl font-bold text-blue-600">
             {{ item.name }}
