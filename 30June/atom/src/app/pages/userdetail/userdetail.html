@@ -1,11 +1,64 @@
-<p>userdetail works!</p>
-@if(userData() == {}){
-    <p>User not found Or data Loading</p>
-}@else{
-    <p>User Details:</p>
-    <ul>
-        <li>ID: {{ userData().id }}</li>
-        <li>Name: {{ userData().name }}</li>
-        <li>Email: {{ userData().email }}</li>
-    </ul>
+@if (userData() == null) {
+  <div class="flex justify-center items-center min-h-screen">
+    <div class="bg-red-100 border border-red-300 text-red-700 rounded-xl p-6 text-center shadow-lg w-96">
+      <h2 class="text-2xl font-bold mb-2">User Not Found</h2>
+      <p>Please check the User ID.</p>
+    </div>
+  </div>
+} @else {
+  <div class="flex justify-center items-center min-h-screen bg-gray-100 p-4">
+    <div class="w-full max-w-lg bg-white rounded-2xl shadow-xl p-6">
+
+      <h2 class="text-3xl font-bold text-center text-blue-600 mb-6">
+        User Details
+      </h2>
+
+      <div class="space-y-4">
+
+        <div class="flex justify-between border-b pb-2">
+          <span class="font-semibold text-gray-600">ID</span>
+          <span>{{ userData()?.id }}</span>
+        </div>
+
+        <div class="flex justify-between border-b pb-2">
+          <span class="font-semibold text-gray-600">Name</span>
+          <span>{{ userData()?.name }}</span>
+        </div>
+
+        <div class="flex justify-between border-b pb-2">
+          <span class="font-semibold text-gray-600">Age</span>
+          <span>{{ userData()?.age }}</span>
+        </div>
+
+        <div class="flex justify-between border-b pb-2">
+          <span class="font-semibold text-gray-600">Email</span>
+          <span>{{ userData()?.email }}</span>
+        </div>
+
+        <div class="flex justify-between border-b pb-2">
+          <span class="font-semibold text-gray-600">Phone</span>
+          <span>{{ userData()?.phone }}</span>
+        </div>
+
+        <div class="flex justify-between border-b pb-2">
+          <span class="font-semibold text-gray-600">City</span>
+          <span>{{ userData()?.city }}</span>
+        </div>
+
+        <div class="flex justify-between border-b pb-2">
+          <span class="font-semibold text-gray-600">Profession</span>
+          <span>{{ userData()?.profession }}</span>
+        </div>
+
+        <div class="flex justify-between">
+          <span class="font-semibold text-gray-600">Salary</span>
+          <span class="font-bold text-green-600">
+            ₹{{ userData()?.salary }}
+          </span>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
 }

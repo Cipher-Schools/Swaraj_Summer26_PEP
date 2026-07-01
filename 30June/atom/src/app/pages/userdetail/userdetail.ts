@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { users } from '../../utils/utils';
+import { User, users } from '../../utils/utils';
 
 @Component({
   selector: 'app-userdetail',
@@ -13,12 +13,12 @@ export class Userdetail{
   user = users;
   userId = 0;
   // userData = {};
-  userData = signal({});
+  userData = signal<User | null>(null);
   ngOnInit() {
     const currId = Number(this.route.snapshot.paramMap.get('userId'));
     console.log(currId);
     this.userId = currId;
-    const arrVal = this.user.find(user => user.id === this.userId) || {};
+    const arrVal = this.user.find(user => user.id === this.userId) || null;
 
     console.log(arrVal);
     this.userData.set(arrVal);

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, input, signal } from '@angular/core';
 
 @Component({
   selector: 'app-about',
@@ -6,4 +6,19 @@ import { Component } from '@angular/core';
   templateUrl: './about.html',
   styleUrl: './about.css',
 })
-export class About {}
+export class About {
+
+  parentData = input<string>();
+
+    ngOnInit() {
+    console.log('%cChild NgOnInit', 'color: green;');
+  }
+
+  ngOnChanges() {
+    console.log('%cChild NgOnChanges', 'color: Red;');
+  }
+
+  ngOnDestroy() {
+    console.log('%cChild NgOnDestroy', 'color: blue;');
+  }
+}
