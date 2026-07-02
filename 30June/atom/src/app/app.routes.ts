@@ -3,8 +3,13 @@ import { Home } from './pages/home/home';
 import { About } from './pages/about/about';
 import { Contact } from './pages/contact/contact';
 import { Userdetail } from './pages/userdetail/userdetail';
+import { Login } from './pages/login/login';
 
 export const routes: Routes = [
+    {
+        path: "",
+        component: Login
+    },
     {
         path: "home",
         component: Home

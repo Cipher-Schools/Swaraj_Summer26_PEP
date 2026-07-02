@@ -36,3 +36,39 @@
 
 <button (click)="updateText()">Update child data</button>
 <app-about [parentData]="textVal()"></app-about>
+
+
+<app-button
+[buttonText]="'Button From Parent'"
+(buttonFn)="buttonFn()"
+[buttonSize]="buttonConfig.sizes.SM"
+[buttonType]="buttonConfig.types.PRIMARY"
+></app-button>
+
+<app-button
+[buttonText]="'Medium Button'"
+(buttonFn)="buttonFn()"
+[buttonSize]="buttonConfig.sizes.MD"
+[buttonType]="buttonConfig.types.SUCCESS"
+></app-button>
+
+<app-button
+[buttonText]="'Large Button'"
+(buttonFn)="buttonFn()"
+[buttonSize]="buttonConfig.sizes.LG"
+[buttonType]="buttonConfig.types.WARNING"
+></app-button>
+
+<app-button
+[buttonText]="'Extra Large Button'"
+(buttonFn)="buttonFn()"
+[buttonSize]="buttonConfig.sizes.XL"
+[buttonType]="buttonConfig.types.DANGER"
+></app-button>
+
+<app-button
+[buttonText]="'SUCCESS'"
+(buttonFn)="buttonFn()"
+[buttonSize]="buttonConfig.sizes.SM"
+[buttonType]="buttonConfig.types.SUCCESS"
+></app-button>

@@ -1,16 +1,19 @@
 import { Component, signal } from '@angular/core';
-import { users } from '../../utils/utils';
+import { buttonConfig, users } from '../../utils/utils';
 import { RouterLink } from '@angular/router';
 import { About } from '../about/about';
+import { Button } from '../../shared/button/button';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, About],
+  imports: [RouterLink, About, Button],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
 export class Home {
+  buttonConfig = buttonConfig;
   textVal = signal<string>("Hello from parent")
+
   ngOnInit() {
     console.log('%cParent NgOnInit', 'color: green;');
   }
@@ -25,6 +28,10 @@ export class Home {
 
   updateText() {
     this.textVal.set(Date.now().toString());
+  }
+
+  buttonFn() {
+    console.log('Button clicked!');
   }
 
   users = users;

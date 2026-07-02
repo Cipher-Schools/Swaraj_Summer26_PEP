@@ -1,0 +1,10 @@
+<div class="flex flex-wrap flex-col justify-center items-center">
+  <input [value]="userName" placeholder="Please enter Username" class="p-6 m-2 bg-gray-300 w-3xl rounded-xl"/>
+  <input [value]="password" placeholder="Please enter Password" class="p-6 m-2 bg-gray-300 w-3xl rounded-xl" />
+  <app-button
+    [buttonText]="'Log In '"
+    (buttonFn)="userLogIn()"
+    [buttonSize]="buttonConfig.sizes.XL"
+    [buttonType]="buttonConfig.types.PRIMARY"
+  ></app-button>
+</div>

@@ -111,3 +111,22 @@ export const users: User[] = [
     salary: 72000,
   },
 ];
+
+export const buttonSizes = {
+  SM : 'h-[35px] w-50 text-sm',
+  MD : 'h-[40px] w-60 text-md',
+  LG : 'h-[45px] w-70 text-lg',
+  XL : 'h-[50px] w-80 text-xl'
+};
+
+const buttonTypes = {
+  PRIMARY: 'bg-blue-500 hover:bg-blue-700 text-white',
+  SUCCESS: 'bg-green-500 hover:bg-green-700 text-white',
+  WARNING: 'bg-yellow-500 hover:bg-yellow-700 text-white',
+  DANGER: 'bg-red-500 hover:bg-red-700 text-white',
+};
+
+export const buttonConfig = {
+  sizes: buttonSizes,
+  types: buttonTypes,
+};
