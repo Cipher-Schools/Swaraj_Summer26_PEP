@@ -9,13 +9,11 @@ import { Component, input, output } from '@angular/core';
 export class Button {
   buttonText = input<string>();
   buttonSize = input<string>();
-  isButtonDisabled = input<boolean>(false);
+  isButtonDisabled = input<boolean>();
   buttonType = input<string>();
   buttonFn = output();
 
   buttonClick() {
     this.buttonFn.emit();
-    console.log(this.buttonSize());
-    console.log(this.buttonType());
   }
 }

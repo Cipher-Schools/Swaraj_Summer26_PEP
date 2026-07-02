@@ -1,9 +1,9 @@
 <div class="flex flex-wrap flex-col justify-center items-center">
-  <h1 class="text-4xl font-bold text-center m-6">Log In</h1>
+  <h1 class="text-4xl font-bold text-center m-6">Sign Up</h1>
   <input [value]="userName" required (input)="userName = $event.target.value" placeholder="Please enter Username" class="p-6 m-2 bg-gray-300 max-w-3xl min-w-xl rounded-xl"/>
   <input type="password" [value]="password" required (input)="password = $event.target.value" placeholder="Please enter Password" class="p-6 m-2 bg-gray-300 max-w-3xl min-w-xl rounded-xl" />
   <app-button
-    [buttonText]="'Log In '"
+    [buttonText]="'Sign Up '"
     (buttonFn)="userLogIn()"
     [buttonSize]="buttonConfig.sizes.XL"
     [buttonType]="buttonConfig.types.PRIMARY"
