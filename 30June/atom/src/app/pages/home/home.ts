@@ -1,8 +1,9 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { buttonConfig, users } from '../../utils/utils';
 import { RouterLink } from '@angular/router';
 import { About } from '../about/about';
 import { Button } from '../../shared/button/button';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -11,8 +12,10 @@ import { Button } from '../../shared/button/button';
   styleUrl: './home.css',
 })
 export class Home {
+  private authService = inject(AuthService);
   buttonConfig = buttonConfig;
   textVal = signal<string>("Hello from parent")
+  // userName = this.authService.userName
 
   ngOnInit() {
     console.log('%cParent NgOnInit', 'color: green;');

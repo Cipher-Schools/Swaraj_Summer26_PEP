@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { Button } from '../../shared/button/button';
 import { buttonConfig } from '../../utils/utils';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -10,29 +11,25 @@ import { Router } from '@angular/router';
   styleUrl: './login.css',
 })
 export class Login {
-  private router = inject(Router);
+  public router = inject(Router);
+  public AuthService = inject(AuthService);
   buttonConfig = buttonConfig;
-  userName = "";
-  password = "";
+  username = '';
+  userpass = '';
   passToggle = false;
-  currLoggedInUser = {} as any;
 
-  ngOnInit(){
-    this.currLoggedInUser = localStorage.getItem("userDetails");
-    this.currLoggedInUser = JSON.parse(this.currLoggedInUser);
-    console.log("currLoggedInUser", this.currLoggedInUser);
+  ngOnInit() {
+    // console.log("Hello from ng")
+    const userDetails = localStorage.getItem('userDetails');
+    const parsedDetails = JSON.parse(userDetails ?? `{}`);
+    this.AuthService.currLoggedInUser.set(parsedDetails);
+    console.log(this.AuthService.currLoggedInUser());
   }
 
+  login() {
 
-  userLogIn(){
-    if(this.userName == this.currLoggedInUser?.name && this.password == this.currLoggedInUser?.pass){
-      // Login successful
-      console.log("Login successful");
-      this.router.navigate(['/home']);
-    }else{
-      // Login failed
-      console.log("Login failed");
-      this.router.navigate(['/signup']);
-    }
+    this.AuthService.password = this.userpass;
+    this.AuthService.userName = this.username;
+    this.AuthService.userLogIn(this.username, this.userpass);
   }
 }

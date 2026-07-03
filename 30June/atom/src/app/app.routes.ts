@@ -5,6 +5,7 @@ import { Contact } from './pages/contact/contact';
 import { Userdetail } from './pages/userdetail/userdetail';
 import { Login } from './pages/login/login';
 import { Signup } from './pages/signup/signup';
+import { authGuard } from './guard/auth-guard';
 
 export const routes: Routes = [
     {
@@ -17,18 +18,22 @@ export const routes: Routes = [
     },
     {
         path: "home",
-        component: Home
+        component: Home,
+        canActivate: [authGuard]
     },
     {
         path: "about",
-        component: About
+        component: About,
+        canActivate: [authGuard]
     },
     {
         path: "contact",
-        component: Contact
+        component: Contact,
+        canActivate: [authGuard]
     },
     {
         path: 'home/user/:userId',
-        component: Userdetail
+        component: Userdetail,
+        canActivate: [authGuard]
     }
 ];
