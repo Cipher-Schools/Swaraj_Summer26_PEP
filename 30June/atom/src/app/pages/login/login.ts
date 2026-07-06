@@ -18,18 +18,21 @@ export class Login {
   userpass = '';
   passToggle = false;
 
-  ngOnInit() {
-    // console.log("Hello from ng")
-    const userDetails = localStorage.getItem('userDetails');
-    const parsedDetails = JSON.parse(userDetails ?? `{}`);
-    this.AuthService.currLoggedInUser.set(parsedDetails);
-    console.log(this.AuthService.currLoggedInUser());
-  }
-
   login() {
-
     this.AuthService.password = this.userpass;
     this.AuthService.userName = this.username;
-    this.AuthService.userLogIn(this.username, this.userpass);
+    const isLoggedIn = this.AuthService.userLogIn(this.username, this.userpass);
+
+    if (isLoggedIn) {
+      this.AuthService.currLoggedInUser.set({
+        name: this.username,
+        pass: this.userpass,
+        currLoggedInUserStatus: true,
+      });
+
+      localStorage.setItem('userDetails', JSON.stringify(this.AuthService.currLoggedInUser()));
+
+      this.router.navigate(['/home']);
+    }
   }
 }

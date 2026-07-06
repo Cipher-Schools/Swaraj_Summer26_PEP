@@ -1,6 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Navbar } from './shared/navbar/navbar';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -9,5 +10,13 @@ import { Navbar } from './shared/navbar/navbar';
   styleUrl: './app.css'
 })
 export class App {
-  protected readonly title = signal('atom');
+  public AuthService = inject(AuthService);
+
+    ngOnInit() {
+    // console.log("Hello from ng")
+    const userDetails = localStorage.getItem('userDetails');
+    const parsedDetails = JSON.parse(userDetails ?? `{}`);
+    this.AuthService.currLoggedInUser.set(parsedDetails);
+    console.log(this.AuthService.currLoggedInUser());
+  }
 }

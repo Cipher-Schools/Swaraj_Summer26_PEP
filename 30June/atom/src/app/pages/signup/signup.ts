@@ -20,7 +20,8 @@ export class Signup {
   userLogIn(){
     const userloginData = {
       name: this.userName,
-      pass: this.password
+      pass: this.password,
+      currLoggedInUserStatus: false
     }
     if(this.userName.trim().length > 3 && this.password.trim().length > 3){
       localStorage.setItem("userDetails", JSON.stringify(userloginData));

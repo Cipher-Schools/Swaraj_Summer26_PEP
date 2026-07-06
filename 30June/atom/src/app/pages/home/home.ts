@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { buttonConfig, users } from '../../utils/utils';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { About } from '../about/about';
 import { Button } from '../../shared/button/button';
 import { AuthService } from '../../services/auth.service';
@@ -13,9 +13,20 @@ import { AuthService } from '../../services/auth.service';
 })
 export class Home {
   private authService = inject(AuthService);
+  public router = inject(Router);
   buttonConfig = buttonConfig;
-  textVal = signal<string>("Hello from parent")
+  textVal = signal<string>('Hello from parent');
   // userName = this.authService.userName
+
+  logout() {
+    this.authService.currLoggedInUser.set({
+      name: '',
+      pass: '',
+      currLoggedInUserStatus: false,
+    });
+    localStorage.removeItem('userDetails');
+    this.router.navigate(['']);
+  }
 
   ngOnInit() {
     console.log('%cParent NgOnInit', 'color: green;');
