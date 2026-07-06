@@ -6,6 +6,7 @@ import { Userdetail } from './pages/userdetail/userdetail';
 import { Login } from './pages/login/login';
 import { Signup } from './pages/signup/signup';
 import { authGuard } from './guard/auth-guard';
+import { Movies } from './pages/movies/movies';
 
 export const routes: Routes = [
     {
@@ -34,6 +35,10 @@ export const routes: Routes = [
     {
         path: 'home/user/:userId',
         component: Userdetail,
+        canActivate: [authGuard]
+    },{
+        path: 'movies',
+        component: Movies,
         canActivate: [authGuard]
     }
 ];
