@@ -7,6 +7,7 @@ import { Login } from './pages/login/login';
 import { Signup } from './pages/signup/signup';
 import { authGuard } from './guard/auth-guard';
 import { Movies } from './pages/movies/movies';
+import { Formpage } from './pages/formpage/formpage';
 
 export const routes: Routes = [
     {
@@ -39,6 +40,10 @@ export const routes: Routes = [
     },{
         path: 'movies',
         component: Movies,
+        canActivate: [authGuard]
+    },{
+        path: 'form',
+        component: Formpage,
         canActivate: [authGuard]
     }
 ];
