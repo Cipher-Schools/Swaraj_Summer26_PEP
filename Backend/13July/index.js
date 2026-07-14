@@ -136,11 +136,22 @@ app.post("/adduser", (req, res) => {
 
 })
 
+app.get("/:urlId", (req, res) => {
+    const id = Number(req.params.urlId);
+    const url = map.get(id);
 
+    // console.log(map);
 
-
-
-app.listen(8080, () => {
-    console.log("%cServer is running on port 8080", "color: red; font-weight: bold;");
+    res.redirect(url);
 })
+
+
+
+
+
+
+
+// app.listen(8080, () => {
+//     console.log("%cServer is running on port 8080", "color: red; font-weight: bold;");
+// })
 
