@@ -9,7 +9,7 @@ const deleteMessage = (id) => {
     return errMessage.DELETE + id;
 }
 
-const statuCodes = {
+const statusCodes = {
     LOGIN : 401,
     SIGNUP : 401,
     UPDATE : 401,
@@ -22,5 +22,5 @@ const statuCodes = {
 module.exports = {
     errMessage,
     deleteMessage,
-    statuCodes
+    statusCodes
 }

@@ -1,11 +1,14 @@
 const express = require("express");
 const fs = require("fs");
 require("dotenv").config();
+const { arr } = require("./storage/storage");
 
 const app = express();
 
 const authRouter = require("./router/auth.route");
+const userRouter = require("./router/user.route");
 const errorHandler = require("./middlewares/errror.middleware");
+const authMiddleware = require("./middlewares/auth.middleware");
 
 // Before AUTH MIDDLEWARE
 
@@ -13,20 +16,23 @@ const errorHandler = require("./middlewares/errror.middleware");
 
 app.use(express.json());
 
-app.use((req, res, next) => {
-  if (fs.existsSync("logger.json")) {
-    fs.appendFileSync("logger.json", `${req.method} ${req.url} ${req.ip}\n`);
-  } else {
-    fs.readFile("logger.json", "utf8", (err) => {
-      fs.appendFileSync("logger.json", `${req.method} ${req.url} ${req.ip}\n`);
-    });
-  }
+// app.use((req, res, next) => {
 
-  console.log(`${req.method} ${req.url} ${req.ip}`);
-  next();
-});
+//   console.log(arr);
+//   if (fs.existsSync("logger.json")) {
+//     fs.appendFileSync("logger.json", `${req.method} ${req.url} ${req.ip}\n`);
+//   } else {
+//     fs.readFile("logger.json", "utf8", (err) => {
+//       fs.appendFileSync("logger.json", `${req.method} ${req.url} ${req.ip}\n`);
+//     });
+//   }
+
+//   console.log(`${req.method} ${req.url} ${req.ip}`);
+//   next();
+// });
 
 app.use("/auth/", authRouter);
+app.use("/user", authMiddleware, userRouter);
 
 app.use(errorHandler);
 
