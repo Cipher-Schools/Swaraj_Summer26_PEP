@@ -6,13 +6,12 @@ const { arr } = require("./storage/storage");
 const app = express();
 
 const authRouter = require("./router/auth.route");
+const connectDb = require("./DB/mongo.db");
 const userRouter = require("./router/user.route");
 const errorHandler = require("./middlewares/errror.middleware");
 const authMiddleware = require("./middlewares/auth.middleware");
 
 // Before AUTH MIDDLEWARE
-
-
 
 app.use(express.json());
 
@@ -32,10 +31,21 @@ app.use(express.json());
 // });
 
 app.use("/auth/", authRouter);
-app.use("/user", authMiddleware, userRouter);
+app.use("/user/", authMiddleware, userRouter);
 
 app.use(errorHandler);
 
-app.listen(process.env.PORT || 8080, () => {
-  console.log(`PORT STARTED ON ${process.env.PORT || 8080}`);
-});
+console.log(connectDb)
+
+connectDb()
+  .then(() => {
+    console.log("DB CONNECTED");
+  })
+  .then(() => {
+    app.listen(process.env.PORT || 8080, () => {
+      console.log(`PORT STARTED ON ${process.env.PORT || 8080}`);
+    });
+  })
+  .catch((err) => {
+    console.log(err);
+  })
