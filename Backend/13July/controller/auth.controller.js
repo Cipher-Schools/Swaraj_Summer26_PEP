@@ -4,10 +4,22 @@ const jwt = require("jsonwebtoken");
 const User = require("../model/user.schema");
 const bcrypt = require("bcrypt");
 
-const authLogin = (req, res, next) => {
+const authLogin = async (req, res, next) => {
   // console.log(arr);
   try {
-    const { name, password } = req.body;
+    const { email, password } = req.body;
+    const existingUser = await User.findOne({ email });
+
+    // console.log(existingUser);
+
+    const isPasswordValid = await bcrypt.compare(
+      password,
+      existingUser.password,
+    );
+    const isUserValid =
+      isPasswordValid && existingUser && email == existingUser.email;
+
+    // console.log(isPasswordValid);
 
     // const isUserValid = arr.find(
     //   (item) => item.username == username && item.password == password,
@@ -15,8 +27,9 @@ const authLogin = (req, res, next) => {
     if (isUserValid) {
       const token = jwt.sign(
         {
-          id: isUserValid.id,
-          username: isUserValid.username,
+          id: existingUser._id,
+          username: existingUser.name,
+          status: existingUser.isActive,
         },
         process.env.JWT_SECRET,
         {
@@ -29,13 +42,13 @@ const authLogin = (req, res, next) => {
         message: "Login Successfull",
         token,
       });
+    } else {
+      res.status(statusCodes.LOGIN).json({
+        status: "SUCCESS",
+        message: "LOGIN FAILED",
+        token,
+      });
     }
-
-    res.status(statusCodes.LOGIN).json({
-      status: "SUCCESS",
-      message: "LOGIN FAILED",
-      token,
-    });
   } catch (err) {
     const error = new Error(err);
     error.status = statusCodes.DEFAULT;
@@ -62,8 +75,8 @@ const authSignUp = async (req, res, next) => {
 
     const username = name;
 
-    const hashedPassword = await bcrypt.hash(password, 10)
-    password = hashedPassword
+    const hashedPassword = await bcrypt.hash(password, 10);
+    password = hashedPassword;
 
     console.log(password);
 
