@@ -1,16 +1,17 @@
-const arr = require("../storage/storage");
+// const arr = require("../storage/storage");
 const { statusCodes, errMessage } = require("../utils/utils");
 const jwt = require("jsonwebtoken");
+const User = require("../model/user.schema");
+const bcrypt = require("bcrypt");
 
 const authLogin = (req, res, next) => {
-
-  console.log(arr);
+  // console.log(arr);
   try {
-    const { username, password } = req.body;
+    const { name, password } = req.body;
 
-    const isUserValid = arr.find(
-      (item) => item.username == username && item.password == password,
-    );
+    // const isUserValid = arr.find(
+    //   (item) => item.username == username && item.password == password,
+    // );
     if (isUserValid) {
       const token = jwt.sign(
         {
@@ -43,21 +44,39 @@ const authLogin = (req, res, next) => {
   }
 };
 
-const authSignUp = (req, res, next) => {
-  console.log(arr);
+const authSignUp = async (req, res, next) => {
   try {
-    console.log(arr);
-    const { username, password } = req.body;
-    console.log(username, password);
-    const obj = {
-      id: Date.now,
-      username,
+    let { name, email, mobile, age, city, isActive, password } = req.body;
+
+    // console.log(req.body);
+
+    const existingUser = await User.findOne({ email });
+    // console.log(existingUser);
+    if (existingUser) {
+      // throw new Error("User already exists"); // Custom Error Check --
+      return res.status(409).json({
+        status: "ERROR",
+        message: "User already exists",
+      });
+    }
+
+    const username = name;
+
+    const hashedPassword = await bcrypt.hash(password, 10)
+    password = hashedPassword
+
+    console.log(password);
+
+    User.create({
+      name,
+      email,
+      mobile,
+      age,
+      city,
+      isActive,
       password,
-    };
+    });
 
-    console.log("Hello from the signup");
-
-    arr.push(obj);
     res.status(201).json({
       status: "SUCCESS",
       message: "User Created successfully",
