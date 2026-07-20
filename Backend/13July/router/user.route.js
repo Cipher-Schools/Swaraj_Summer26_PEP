@@ -7,5 +7,6 @@ const {
 
 
 userRouter.get("/home", userHome);
+// userRouter.post("/image". )
 
 module.exports = userRouter;
