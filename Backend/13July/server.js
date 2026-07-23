@@ -15,23 +15,29 @@ const authMiddleware = require("./middlewares/auth.middleware");
 
 app.use(express.json());
 
-// app.use((req, res, next) => {
+app.use((req, res, next) => {
 
-//   console.log(arr);
-//   if (fs.existsSync("logger.json")) {
-//     fs.appendFileSync("logger.json", `${req.method} ${req.url} ${req.ip}\n`);
-//   } else {
-//     fs.readFile("logger.json", "utf8", (err) => {
-//       fs.appendFileSync("logger.json", `${req.method} ${req.url} ${req.ip}\n`);
-//     });
-//   }
+  // console.log(arr);
+  // if (fs.existsSync("logger.json")) {
+  //   fs.appendFileSync("logger.json", `${req.method} ${req.url} ${req.ip}\n`);
+  // } else {
+  //   fs.readFile("logger.json", "utf8", (err) => {
+  //     fs.appendFileSync("logger.json", `${req.method} ${req.url} ${req.ip}\n`);
+  //   });
+  // }
 
-//   console.log(`${req.method} ${req.url} ${req.ip}`);
-//   next();
-// });
+  console.log(`${req.method} ${req.url} ${req.ip}`);
+  next();
+});
 
 app.use("/auth/", authRouter);
 app.use("/user/", authMiddleware, userRouter);
+app.get("/health", (req, res) => {
+  res.json({
+    status: "success",
+    data: "HEALTHY",
+  });
+})
 
 app.use(errorHandler);
 
