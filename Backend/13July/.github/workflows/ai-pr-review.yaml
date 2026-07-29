@@ -1,13 +1,134 @@
-name: AI review
+name: AI PR Review
 
 on:
   pull_request:
     types: [opened, synchronize, reopened, closed]
 
 jobs:
-    review:
-        runs-on: ubantu-latest
+  review:
+    runs-on: ubuntu-latest
 
     permissions:
-        contents: read
-        pull-requests: write
+      contents: read
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm install axios @octokit/rest
+
+      - name: AI Review
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GROK_API_KEY: ${{ secrets.GROK_API_KEY }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          node <<'EOF'
+          const { execSync } = require("child_process");
+          const axios = require("axios");
+          const { Octokit } = require("@octokit/rest");
+
+          const MAX_CHAR = 12000;
+
+          const OCTOKIT = new Octokit({
+            auth: process.env.GITHUB_TOKEN,
+          });
+
+          async function review() {
+            const base = process.env.BASE_SHA;
+            const head = process.env.HEAD_SHA;
+
+            let difference;
+
+            try {
+              difference = execSync(`git diff ${base} ${head}`)
+                .toString()
+                .trim();
+            } catch (e) {
+              console.error(`Git diff failed: ${e}`);
+              process.exit(1);
+            }
+
+            if (!difference) {
+              console.log("No difference found");
+              return;
+            }
+
+            let fileDiffs = difference
+              .split(/^diff --git /gm)
+              .filter(Boolean);
+
+            let finalReview = "AI Code Review\n\n";
+
+            for (const fileDiff of fileDiffs) {
+              const match = fileDiff.match(/^a\/(.+?) b\//m);
+
+              if (!match) continue;
+
+              console.log(match[1]);
+
+              let file = match[1];
+
+              if (/\.(png|jpe?g|gif|webp|pdf|zip|exe|mp3|mp4)$/i.test(file)) {
+                console.log(`Skipping binary file: ${file}`);
+                continue;
+              }
+
+              const chunk =
+                fileDiff.length > MAX_CHAR
+                  ? fileDiff.slice(0, MAX_CHAR)
+                  : fileDiff;
+
+              try {
+                const response = await axios.post(
+                  "https://api.x.ai/v1/chat/completions",
+                  {
+                    model: "grok-3-latest",
+                    messages: [
+                      {
+                        role: "system",
+                        content: `You are a Senior Software Engineer reviewing this GitHub Pull Request for a production codebase.
+                                  Identify bugs, security issues, performance problems, edge cases, and best practice violations, and provide concise, actionable feedback with suggested fixes.
+                                  Review only the changed code and reply "✅ LGTM" if no significant issues are found.`
+                      },
+                      {
+                        role: "user",
+                        content: `Review this git diff for file: ${file} ${chunk}`
+                      }
+                    ],
+                    max_tokens: 1024
+                  },
+                  {
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${process.env.GROK_API_KEY}`
+                    }
+                  }
+                );
+
+                finalReview += response.data.choices[0].message.content + "\n\n";
+              } catch (err) {
+                console.log("Error:", err.response?.data || err.message);
+              }
+            }
+
+            await OCTOKIT.issues.createComment({
+              owner: process.env.OWNER,
+              repo: process.env.REPO,
+              issue_number: Number(process.env.PR_NUMBER),
+              body: finalReview
+            });
+          }
+
+          review();
+          EOF
