@@ -1,9 +1,13 @@
 "use strict";
+
+const OLLAMA_URL = "http://ollama:11434";
 const { v4: uuidv4 } = require("uuid");
 // const pdfParse = require('pdf-parse');
 const pdfParse = require("pdf-parse");
 const CHUNK_SIZE = 500;
 const OVERLAP = 100;
+const CHAT_MODEL = "qwen3:8b";
+const EMBED_MODEL = "nomic-embed-text";
 const TOP_K = 5;
 
 async function parsePdf(buffer) {
@@ -19,7 +23,7 @@ async function parsePdf(buffer) {
   return { text, pages: result.numpages };
 }
 
-function chuckText(text, documentId, pages) {
+function chunkText(text, documentId, pages) {
   const word = text.split(" ").filter(Boolean);
   const steps = CHUNK_SIZE - OVERLAP;
   const chunks = [];
@@ -33,14 +37,31 @@ function chuckText(text, documentId, pages) {
     const pageNum = Math.max(1, Math.ceil(mid / word.length) * pages);
 
     chunks.push({
-        chuckId: uuidv4(),
-        documentId,
-        pageNum,
-        text: chuckWord.join(" "),
-    })
+      chuckId: uuidv4(),
+      documentId,
+      pageNum,
+      text: chuckWord.join(" "),
+    });
   }
 
   return chunks;
+}
+
+async function embedData(chunk) {
+  const res = await fetch(`${OLLAMA_URL}/api/embed`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: EMBED_MODEL,
+      input: chunk.text,
+    }),
+    signal: AbortSignal.timeout(120000),
+  });
+
+  const data = await res.json();
+  return data;
 }
 
 async function indexDocument(buffer, filename) {
@@ -52,10 +73,19 @@ async function indexDocument(buffer, filename) {
   const { text, pages } = await parsePdf(buffer);
 
   // Chunk Data
-  const chuck = chuckText(text, documentId, pages);
+  const chunks = chunkText(text, documentId, pages);
+
+  // Embed the chunk Data
+  const vectors = [];
+  for (const chunk of chunks) {
+    const vector = await embedData(chunk);
+    vectors.push(vector);
+  }
+
+  console.log(vectors[0], chunks[0]);
 }
 
-async function askQuestions() {} 
+async function askQuestions() {}
 
 module.exports = {
   askQuestions,
