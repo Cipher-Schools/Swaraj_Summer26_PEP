@@ -20,14 +20,24 @@ app.post("/upload", upload.single("pdf"), async (req, res) => {
     const buffer = fs.readFileSync(req.file.path);
 
     // Rag fn to upload file - Fn Name is IndexDocument
-    indexDocument(buffer, req.file.originalname);
+    const { documentId, filename, pages, totalChunks } = await indexDocument(
+      buffer,
+      req.file.originalname,
+    );
 
     fs.unlinkSync(req.file.path);
+
+    res.status(200).json({
+      message: "File uploaded successfully",
+      documentId,
+      filename,
+      pages,
+      totalChunks,
+    })
+
   } catch (err) {
     res.send(`Unexpected Error Occured ${err}`);
   }
-
-  res.send("File uploaded successfully");
 });
 
 app.listen(3000, () => console.log("Server is running on port 3000"));

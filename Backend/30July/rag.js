@@ -8,7 +8,10 @@ const CHUNK_SIZE = 500;
 const OVERLAP = 100;
 const CHAT_MODEL = "qwen3:8b";
 const EMBED_MODEL = "nomic-embed-text";
+const QDRANT_URL = "http://qdrant:6333";
 const TOP_K = 5;
+const COLLECTION_NAME = "pdf_chunks";
+const VECTOR_DIM = 768;
 
 async function parsePdf(buffer) {
   const result = await pdfParse(buffer);
@@ -30,17 +33,17 @@ function chunkText(text, documentId, pages) {
 
   for (let start = 0; start < word.length; start += steps) {
     const end = Math.min(start + CHUNK_SIZE, word.length);
-    const chuckWord = word.slice(start, end);
+    const chunkWord = word.slice(start, end);
 
-    // Extimate Page Number
-    const mid = start + Math.floor(chuckWord.length / 2);
+    // Estimate Page Number
+    const mid = start + Math.floor(chunkWord.length / 2);
     const pageNum = Math.max(1, Math.ceil(mid / word.length) * pages);
 
     chunks.push({
-      chuckId: uuidv4(),
+      chunkId: uuidv4(),
       documentId,
       pageNum,
-      text: chuckWord.join(" "),
+      text: chunkWord.join(" "),
     });
   }
 
@@ -48,20 +51,81 @@ function chunkText(text, documentId, pages) {
 }
 
 async function embedData(chunk) {
-  const res = await fetch(`${OLLAMA_URL}/api/embed`, {
+  const res = await fetch(`${OLLAMA_URL}/api/embeddings`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       model: EMBED_MODEL,
-      input: chunk.text,
+      prompt: chunk.text,
     }),
     signal: AbortSignal.timeout(120000),
   });
 
   const data = await res.json();
-  return data;
+  if (!data.embedding) {
+    throw new Error(`Embedding failed: ${JSON.stringify(data)}`);
+  }
+
+  return data.embedding;
+}
+
+async function ensureCollectionExists() {
+  const check = await fetch(`${QDRANT_URL}/collections/${COLLECTION_NAME}`);
+  if (check.status === 404) {
+    {
+      const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION_NAME}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          vectors: {
+            size: VECTOR_DIM,
+            distance: "Cosine",
+          },
+        }),
+        signal: AbortSignal.timeout(120000),
+      });
+
+      if (res.status !== 200) {
+        throw new Error(`Failed to create collection: ${errorData.message}`);
+      }
+
+      console.log(`Collection ${COLLECTION_NAME} created successfully.`);
+    }
+  }
+}
+
+async function storeChunksInQdrant(vectors, chunks) {
+  const points = chunks.map((c, i) => {
+    return {
+      id: c.chunkId,
+      vector: vectors[i],
+      payload: {
+        documentId: c.documentId,
+        pageNum: c.pageNum,
+        chunkText: c.text,
+        chunkId: c.chunkId,
+      }
+    };
+  });
+
+  const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION_NAME}/points`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ points }),
+    signal: AbortSignal.timeout(120000),
+  });
+
+  console.log(res);
+
+  if (res.status !== 200) {
+    console.error(`Failed to store chunks in Qdrant`);
+  }
+
+  console.log(`Stored ${points.length} chunks in Qdrant successfully.`);
 }
 
 async function indexDocument(buffer, filename) {
@@ -82,7 +146,16 @@ async function indexDocument(buffer, filename) {
     vectors.push(vector);
   }
 
-  console.log(vectors[0], chunks[0]);
+  await ensureCollectionExists();
+  await storeChunksInQdrant(vectors, chunks);
+
+  // console.log(vectors[0], chunks[0]);
+  return {
+    documentId,
+    filename,
+    pages,
+    totalChunks: chunks.length,
+  }
 }
 
 async function askQuestions() {}
