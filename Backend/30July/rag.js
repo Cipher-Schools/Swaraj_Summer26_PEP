@@ -56,7 +56,7 @@ async function embedData(chunk) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       model: EMBED_MODEL,
-      prompt: chunk.text,
+      prompt: chunk.text || chunk,
     }),
     signal: AbortSignal.timeout(120000),
   });
@@ -106,18 +106,21 @@ async function storeChunksInQdrant(vectors, chunks) {
         pageNum: c.pageNum,
         chunkText: c.text,
         chunkId: c.chunkId,
-      }
+      },
     };
   });
 
-  const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION_NAME}/points`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
+  const res = await fetch(
+    `${QDRANT_URL}/collections/${COLLECTION_NAME}/points`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ points }),
+      signal: AbortSignal.timeout(120000),
     },
-    body: JSON.stringify({ points }),
-    signal: AbortSignal.timeout(120000),
-  });
+  );
 
   console.log(res);
 
@@ -155,10 +158,53 @@ async function indexDocument(buffer, filename) {
     filename,
     pages,
     totalChunks: chunks.length,
-  }
+  };
 }
 
-async function askQuestions() {}
+async function searchChunk(embedQuestion, documentId) {
+  const res = await fetch(
+    `${QDRANT_URL}/collections/${COLLECTION_NAME}/points/search`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        vector: embedQuestion,
+        limit: TOP_K,
+        with_payload: true,
+      }),
+      signal: AbortSignal.timeout(120000),
+    },
+  );
+
+  console.log('\n\n\n\n\n\n\n\n\n\n\n')
+  console.log(embedQuestion);
+
+  if (res.status !== 200) {
+    console.error(`Failed to search chunks in Qdrant`);
+  }
+
+  const data = await res.json();
+
+  console.log(`Found ${data.result.length} chunks in Qdrant.`);
+}
+
+async function askQuestions(question, documentId) {
+  const embedQuestion = await embedData(question);
+
+  console.log(`Embedding for question: ${embedQuestion}`);
+
+  await searchChunk(embedQuestion, documentId);
+}
+
+// {
+//     "message": "File uploaded successfully",
+//     "documentId": "6898b0b8-6c9e-4247-9286-b5d51bc06dee",
+//     "filename": "POEMS.pdf",
+//     "pages": 28,
+//     "totalChunks": 21
+// }
 
 module.exports = {
   askQuestions,

@@ -1,9 +1,10 @@
 const express = require("express");
 const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
-const { indexDocument } = require("./rag");
+const { indexDocument, askQuestions } = require("./rag");
 const fs = require("fs");
 const app = express();
+app.use(express.json());
 
 app.post("/upload", upload.single("pdf"), async (req, res) => {
   //   console.log(req.file);
@@ -33,10 +34,28 @@ app.post("/upload", upload.single("pdf"), async (req, res) => {
       filename,
       pages,
       totalChunks,
-    })
-
+    });
   } catch (err) {
     res.send(`Unexpected Error Occured ${err}`);
+  }
+});
+
+app.post("/ask", async (req, res) => {
+  console.log(req.body);
+  const { question, documentId } = req.body;
+
+  if (!question || !documentId) {
+    res.status(400).json({
+      message: "Please provide both question and documentId",
+    });
+  }
+
+  try{
+    await askQuestions(question, documentId);
+  }catch(err){
+    res.status(500).json({
+      message: `Unexpected Error Occured ${err}`,
+    });
   }
 });
 
