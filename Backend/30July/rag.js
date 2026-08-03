@@ -37,7 +37,7 @@ function chunkText(text, documentId, pages) {
 
     // Estimate Page Number
     const mid = start + Math.floor(chunkWord.length / 2);
-    const pageNum = Math.max(1, Math.ceil(mid / word.length) * pages);
+    const pageNum = Math.max(1, Math.round((mid / word.length) * pages));
 
     chunks.push({
       chunkId: uuidv4(),
@@ -178,24 +178,30 @@ async function searchChunk(embedQuestion, documentId) {
     },
   );
 
-  console.log('\n\n\n\n\n\n\n\n\n\n\n')
-  console.log(embedQuestion);
-
   if (res.status !== 200) {
     console.error(`Failed to search chunks in Qdrant`);
   }
 
   const data = await res.json();
+  return data.result ?? data;
+}
 
-  console.log(`Found ${data.result.length} chunks in Qdrant.`);
+async function buildPromptAndAsk(results, question) {
+  const contextBlock = results.map((c, i) => {
+    return `[Context ${i + 1} - Page ${c.payload.pageNum}]: ${c.payload.chunkText}]`;
+  });
+
+  console.log(`Context Block: ${contextBlock}`);
 }
 
 async function askQuestions(question, documentId) {
   const embedQuestion = await embedData(question);
 
-  console.log(`Embedding for question: ${embedQuestion}`);
+  const results = await searchChunk(embedQuestion, documentId);
 
-  await searchChunk(embedQuestion, documentId);
+  await buildPromptAndAsk(results, question);
+
+  // console.log(results);
 }
 
 // {
