@@ -51,7 +51,11 @@ app.post("/ask", async (req, res) => {
   }
 
   try{
-    await askQuestions(question, documentId);
+    const answer = await askQuestions(question, documentId);
+
+    res.status(200).json({
+      answer,
+    });
   }catch(err){
     res.status(500).json({
       message: `Unexpected Error Occured ${err}`,

@@ -187,11 +187,59 @@ async function searchChunk(embedQuestion, documentId) {
 }
 
 async function buildPromptAndAsk(results, question) {
-  const contextBlock = results.map((c, i) => {
-    return `[Context ${i + 1} - Page ${c.payload.pageNum}]: ${c.payload.chunkText}]`;
+  const contextBlock = results
+    .map(
+      (c, i) =>
+        `[Context ${i + 1} - Page ${c.payload.pageNum}]:\n${c.payload.chunkText}`,
+    )
+    .join("\n\n---\n\n");
+
+  return [
+    {
+      role: "system",
+      content: `You are an AI bot powered by Retrieval-Augmented Generation (RAG).
+
+                ## Role
+                Your job is to answer user questions ONLY using the retrieved context provided to you.
+
+                ## Tone
+                - Be professional, friendly, and concise.
+                - Use clear and simple language.
+                - Be confident only when the answer is supported by the provided context.
+
+                ## Rules
+                - Answer ONLY from the provided context.
+                - Never use your own knowledge, memory, or internet information.
+                - Never guess, assume, or add missing details.
+                - If the answer is not available in the context, reply exactly: "I don't know. The provided context does not contain enough information to answer this question."
+                - If multiple context chunks contain relevant information, combine only the explicitly stated facts.
+                - Use Markdown when appropriate.`,
+    },
+    {
+      role: "user",
+      content: `Context: ${contextBlock} Question: ${question}`,
+    },
+  ];
+}
+
+async function generateAnswer(messages) {
+  const res = await fetch(`${OLLAMA_URL}/api/chat`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: CHAT_MODEL,
+      messages,
+      stream: false,
+      options: {
+        temperature: 0.2,
+      },
+    }),
   });
 
-  console.log(`Context Block: ${contextBlock}`);
+  const data = await res.json();
+
+  console.log(data.message.content);
+  return data.message.content.trim();
 }
 
 async function askQuestions(question, documentId) {
@@ -199,9 +247,13 @@ async function askQuestions(question, documentId) {
 
   const results = await searchChunk(embedQuestion, documentId);
 
-  await buildPromptAndAsk(results, question);
+  const message = await buildPromptAndAsk(results, question);
 
-  // console.log(results);
+  const answer = await generateAnswer(message);
+
+  return answer;
+
+  // console.log(message);
 }
 
 // {
